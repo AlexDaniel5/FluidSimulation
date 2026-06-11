@@ -101,7 +101,7 @@ int main(int argc, char* argv[]) {
 
         fluid_step(fluid, 0.1f);
 
-        renderer_draw(renderer, fluid);
+        renderer_draw(renderer, fluid, input.showGrid);
         SDL_RenderPresent(renderer);
         SDL_Delay(16);
     }

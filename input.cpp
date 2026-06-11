@@ -3,6 +3,7 @@
 
 void input_init(InputState& state) {
     state.isDrawing  = false;
+    state.showGrid   = false;
     state.mode       = MODE_SOLID;
     state.prevMouseX = 0;
     state.prevMouseY = 0;
@@ -42,6 +43,9 @@ bool input_handle_event(InputState& state, const SDL_Event& event, FluidState& f
         switch (event.key.keysym.sym) {
             case SDLK_SPACE:
                 state.mode = static_cast<DrawMode>((state.mode + 1) % 3);
+                break;
+            case SDLK_g:
+                state.showGrid = !state.showGrid;
                 break;
             case SDLK_r:
                 fluid_reset(fluid);

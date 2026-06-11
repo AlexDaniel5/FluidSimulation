@@ -7,6 +7,7 @@ enum DrawMode { MODE_SOLID = 0, MODE_SAND, MODE_FLUID };
 
 struct InputState {
     bool isDrawing;
+    bool showGrid;  // debug grid-line overlay, toggled with G
     DrawMode mode;
     int prevMouseX;
     int prevMouseY;
