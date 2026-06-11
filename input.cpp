@@ -29,7 +29,9 @@ bool input_handle_event(InputState& state, const SDL_Event& event, FluidState& f
                 float dx = (float)(event.motion.x - state.prevMouseX);
                 float dy = (float)(event.motion.y - state.prevMouseY);
                 fluid_add_density(fluid, cx, cy, 0.5f);
-                fluid_add_velocity(fluid, cx, cy, dx / CELL_SIZE * 0.1f, dy / CELL_SIZE * 0.1f);
+                // Particle velocities are in cells/second; turn the per-event
+                // mouse delta into a fling impulse.
+                fluid_add_velocity(fluid, cx, cy, dx / CELL_SIZE * 4.0f, dy / CELL_SIZE * 4.0f);
             }
         }
         state.prevMouseX = event.motion.x;
