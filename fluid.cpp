@@ -14,7 +14,7 @@ const int   SEED_PER_CELL = 4;
 const float PARTICLE_MASS = 0.3f;   // render-density contribution
 const float MAX_SPEED     = 80.0f;  // cells/s
 const float REST_DENSITY  = (float)SEED_PER_CELL;  // mass per interior cell
-const float DRIFT_STIFF   = 1.0f;   // density-error feedback into pressure rhs
+const float DRIFT_STIFF   = 3.0f;   // density-error feedback into pressure rhs
 const int   PUSH_ITER     = 2;
 const float PUSH_DIST     = 0.45f;  // min particle spacing (4/cell => 0.5)
 

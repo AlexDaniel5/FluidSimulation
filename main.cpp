@@ -5,31 +5,12 @@
 #include <SDL.h>
 #include "grid.h"
 #include "fluid.h"
+#include "sand.h"
 #include "renderer.h"
 #include "input.h"
 
 // Single definition of the shared grid
 int grid[GRID_HEIGHT][GRID_WIDTH] = {0};
-
-static void update_sand() {
-    for (int y = GRID_HEIGHT - 2; y >= 0; --y) {
-        for (int x = 0; x < GRID_WIDTH; ++x) {
-            if (grid[y][x] != SAND) continue;
-
-            if (grid[y + 1][x] == EMPTY) {
-                grid[y + 1][x] = SAND;
-                grid[y][x]     = EMPTY;
-            } else {
-                int dir  = (std::rand() % 2 == 0) ? -1 : 1;
-                int newX = x + dir;
-                if (newX >= 0 && newX < GRID_WIDTH && grid[y + 1][newX] == EMPTY) {
-                    grid[y + 1][newX] = SAND;
-                    grid[y][x]        = EMPTY;
-                }
-            }
-        }
-    }
-}
 
 static const char* mode_name(DrawMode m) {
     switch (m) {
@@ -96,9 +77,7 @@ int main(int argc, char* argv[]) {
         }
 
         frameCount++;
-        if (frameCount % 6 == 0)
-            update_sand();
-
+        sand_update(fluid, frameCount);
         fluid_step(fluid, 0.1f);
 
         renderer_draw(renderer, fluid, input.showGrid);
