@@ -77,7 +77,7 @@ int main(int argc, char* argv[]) {
         }
 
         frameCount++;
-        sand_update(fluid, frameCount);
+        sand_update(fluid, frameCount, 0.1f);
         fluid_step(fluid, 0.1f);
 
         renderer_draw(renderer, fluid, input.showGrid);
