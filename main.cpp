@@ -61,6 +61,7 @@ int main(int argc, char* argv[]) {
     bool running = true;
     SDL_Event event;
     DrawMode prevMode = input.mode;
+    int prevBrush = -1;
 
     while (running) {
         while (SDL_PollEvent(&event)) {
@@ -68,12 +69,14 @@ int main(int argc, char* argv[]) {
                 running = false;
         }
 
-        // Update window title when draw mode changes
-        if (input.mode != prevMode) {
+        // Update window title when draw mode or brush size changes
+        if (input.mode != prevMode || input.brushRadius != prevBrush) {
             char title[64];
-            std::snprintf(title, sizeof(title), "FluidSimulation [%s]", mode_name(input.mode));
+            std::snprintf(title, sizeof(title), "FluidSimulation [%s]  brush:%d",
+                          mode_name(input.mode), input.brushRadius);
             SDL_SetWindowTitle(window, title);
             prevMode = input.mode;
+            prevBrush = input.brushRadius;
         }
 
         frameCount++;

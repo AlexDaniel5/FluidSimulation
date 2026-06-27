@@ -2,11 +2,41 @@
 #include <cstring>
 
 void input_init(InputState& state) {
-    state.isDrawing  = false;
-    state.showGrid   = false;
-    state.mode       = MODE_SOLID;
-    state.prevMouseX = 0;
-    state.prevMouseY = 0;
+    state.isDrawing   = false;
+    state.showGrid    = false;
+    state.mode        = MODE_SOLID;
+    state.brushRadius = 1;
+    state.prevMouseX  = 0;
+    state.prevMouseY  = 0;
+}
+
+// Stamp the current material over a disc of cells centered on the pixel
+// (px, py). dx/dy are the mouse delta this event, used as a fling impulse in
+// fluid mode. A radius of 0 paints just the single cell under the cursor.
+static void paint_at(InputState& state, FluidState& fluid, int px, int py,
+                     float dx, float dy) {
+    int ccx = px / CELL_SIZE;
+    int ccy = py / CELL_SIZE;
+    int r = state.brushRadius;
+    for (int cy = ccy - r; cy <= ccy + r; ++cy) {
+        for (int cx = ccx - r; cx <= ccx + r; ++cx) {
+            if (cx < 0 || cx >= GRID_WIDTH || cy < 0 || cy >= GRID_HEIGHT) continue;
+            int ox = cx - ccx, oy = cy - ccy;
+            if (ox * ox + oy * oy > r * r) continue;  // disc, not square
+
+            if (state.mode == MODE_SOLID) {
+                grid[cy][cx] = SOLID;
+            } else if (state.mode == MODE_SAND) {
+                grid[cy][cx] = SAND;
+            } else {
+                fluid_add_density(fluid, cx, cy, 0.5f);
+                // Particle velocities are in cells/second; turn the per-event
+                // mouse delta into a fling impulse.
+                fluid_add_velocity(fluid, cx, cy,
+                                   dx / CELL_SIZE * 4.0f, dy / CELL_SIZE * 4.0f);
+            }
+        }
+    }
 }
 
 bool input_handle_event(InputState& state, const SDL_Event& event, FluidState& fluid) {
@@ -16,25 +46,14 @@ bool input_handle_event(InputState& state, const SDL_Event& event, FluidState& f
         state.isDrawing  = true;
         state.prevMouseX = event.button.x;
         state.prevMouseY = event.button.y;
+        // Paint on press so a single click (no drag) still draws.
+        paint_at(state, fluid, event.button.x, event.button.y, 0.0f, 0.0f);
     } else if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
         state.isDrawing = false;
     } else if (event.type == SDL_MOUSEMOTION && state.isDrawing) {
-        int cx = event.motion.x / CELL_SIZE;
-        int cy = event.motion.y / CELL_SIZE;
-        if (cx >= 0 && cx < GRID_WIDTH && cy >= 0 && cy < GRID_HEIGHT) {
-            if (state.mode == MODE_SOLID) {
-                grid[cy][cx] = SOLID;
-            } else if (state.mode == MODE_SAND) {
-                grid[cy][cx] = SAND;
-            } else {
-                float dx = (float)(event.motion.x - state.prevMouseX);
-                float dy = (float)(event.motion.y - state.prevMouseY);
-                fluid_add_density(fluid, cx, cy, 0.5f);
-                // Particle velocities are in cells/second; turn the per-event
-                // mouse delta into a fling impulse.
-                fluid_add_velocity(fluid, cx, cy, dx / CELL_SIZE * 4.0f, dy / CELL_SIZE * 4.0f);
-            }
-        }
+        float dx = (float)(event.motion.x - state.prevMouseX);
+        float dy = (float)(event.motion.y - state.prevMouseY);
+        paint_at(state, fluid, event.motion.x, event.motion.y, dx, dy);
         state.prevMouseX = event.motion.x;
         state.prevMouseY = event.motion.y;
     }
@@ -46,6 +65,12 @@ bool input_handle_event(InputState& state, const SDL_Event& event, FluidState& f
                 break;
             case SDLK_g:
                 state.showGrid = !state.showGrid;
+                break;
+            case SDLK_LEFTBRACKET:
+                if (state.brushRadius > BRUSH_MIN) state.brushRadius--;
+                break;
+            case SDLK_RIGHTBRACKET:
+                if (state.brushRadius < BRUSH_MAX) state.brushRadius++;
                 break;
             case SDLK_r:
                 fluid_reset(fluid);

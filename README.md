@@ -48,8 +48,10 @@ The binary is produced at `build/fluidSimulation`.
 
 | Input | Action |
 |-------|--------|
-| **Left-click + drag** | Draw the currently selected material (or fling water in fluid mode) |
+| **Left-click (or drag)** | Draw the currently selected material (or fling water in fluid mode) |
 | **Space** | Cycle draw mode: `SOLID` → `SAND` → `FLUID` |
+| **`[`** | Shrink the brush radius |
+| **`]`** | Grow the brush radius |
 | **G** | Toggle the debug grid-line overlay |
 | **R** | Reset the fluid (clears particles, keeps solids/sand) |
 | **C** | Clear everything (fluid *and* the obstacle grid) |

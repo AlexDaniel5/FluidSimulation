@@ -5,10 +5,15 @@
 
 enum DrawMode { MODE_SOLID = 0, MODE_SAND, MODE_FLUID };
 
+// Brush radius in cells (0 = single cell). Adjusted with [ and ].
+const int BRUSH_MIN = 0;
+const int BRUSH_MAX = 5;
+
 struct InputState {
     bool isDrawing;
     bool showGrid;  // debug grid-line overlay, toggled with G
     DrawMode mode;
+    int brushRadius;
     int prevMouseX;
     int prevMouseY;
 };
