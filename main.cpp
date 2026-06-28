@@ -17,6 +17,7 @@ static const char* mode_name(DrawMode m) {
         case MODE_SOLID: return "SOLID";
         case MODE_SAND:  return "SAND";
         case MODE_FLUID: return "FLUID";
+        case MODE_ERASE: return "ERASE";
         default:         return "?";
     }
 }

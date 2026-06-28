@@ -40,3 +40,5 @@ void fluid_reset(FluidState& state);
 void fluid_step(FluidState& state, float dt);
 void fluid_add_density(FluidState& state, int x, int y, float amount);
 void fluid_add_velocity(FluidState& state, int x, int y, float vx, float vy);
+// Remove every fluid particle currently inside cell (x, y).
+void fluid_remove(FluidState& state, int x, int y);

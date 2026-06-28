@@ -3,7 +3,7 @@
 #include "grid.h"
 #include "fluid.h"
 
-enum DrawMode { MODE_SOLID = 0, MODE_SAND, MODE_FLUID };
+enum DrawMode { MODE_SOLID = 0, MODE_SAND, MODE_FLUID, MODE_ERASE, MODE_COUNT };
 
 // Brush radius in cells (0 = single cell). Adjusted with [ and ].
 const int BRUSH_MIN = 0;

@@ -28,6 +28,9 @@ static void paint_at(InputState& state, FluidState& fluid, int px, int py,
                 grid[cy][cx] = SOLID;
             } else if (state.mode == MODE_SAND) {
                 grid[cy][cx] = SAND;
+            } else if (state.mode == MODE_ERASE) {
+                grid[cy][cx] = EMPTY;
+                fluid_remove(fluid, cx, cy);
             } else {
                 fluid_add_density(fluid, cx, cy, 0.5f);
                 // Particle velocities are in cells/second; turn the per-event
@@ -61,7 +64,7 @@ bool input_handle_event(InputState& state, const SDL_Event& event, FluidState& f
     if (event.type == SDL_KEYDOWN) {
         switch (event.key.keysym.sym) {
             case SDLK_SPACE:
-                state.mode = static_cast<DrawMode>((state.mode + 1) % 3);
+                state.mode = static_cast<DrawMode>((state.mode + 1) % MODE_COUNT);
                 break;
             case SDLK_g:
                 state.showGrid = !state.showGrid;

@@ -341,6 +341,17 @@ void fluid_add_density(FluidState& s, int x, int y, float) {
     }
 }
 
+void fluid_remove(FluidState& s, int x, int y) {
+    if (x < 0 || x >= GRID_WIDTH || y < 0 || y >= GRID_HEIGHT) return;
+    // Compact in place, dropping any particle whose cell is (x, y).
+    size_t w = 0;
+    for (size_t r = 0; r < s.particles.size(); ++r) {
+        if ((int)s.particles[r].x == x && (int)s.particles[r].y == y) continue;
+        s.particles[w++] = s.particles[r];
+    }
+    s.particles.resize(w);
+}
+
 void fluid_add_velocity(FluidState& s, int x, int y, float vx, float vy) {
     float cx = x + 0.5f, cy = y + 0.5f;
     const float r2 = 1.5f * 1.5f;
