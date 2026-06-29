@@ -3,7 +3,7 @@
 #include "grid.h"
 #include "fluid.h"
 
-enum DrawMode { MODE_SOLID = 0, MODE_SAND, MODE_FLUID, MODE_ERASE, MODE_COUNT };
+enum DrawMode { MODE_SOLID = 0, MODE_SAND, MODE_FLUID, MODE_COUNT };
 
 // Brush radius in cells (0 = single cell). Adjusted with [ and ].
 const int BRUSH_MIN = 0;
@@ -11,7 +11,8 @@ const int BRUSH_MAX = 5;
 
 struct InputState {
     bool isDrawing;
-    bool showGrid;  // debug grid-line overlay, toggled with G
+    bool showGrid;   // debug grid-line overlay, toggled with G
+    bool eraseHeld;  // E held down: drawing rubs out cells instead of the active material
     DrawMode mode;
     int brushRadius;
     int prevMouseX;
@@ -21,3 +22,7 @@ struct InputState {
 void input_init(InputState& state);
 // Returns false when the user requests quit.
 bool input_handle_event(InputState& state, const SDL_Event& event, FluidState& fluid);
+// Per-frame, position-based actions. While E is held this continuously erases
+// the cells under the cursor, so material that flows into the mouse is removed
+// even without clicking or moving.
+void input_update(InputState& state, FluidState& fluid);

@@ -48,8 +48,9 @@ The binary is produced at `build/fluidSimulation`.
 
 | Input | Action |
 |-------|--------|
-| **Left-click (or drag)** | Draw the currently selected material (or fling water in fluid mode, or rub out cells in erase mode) |
-| **Space** | Cycle draw mode: `SOLID` → `SAND` → `FLUID` → `ERASE` |
+| **Left-click (or drag)** | Draw the currently selected material (or fling water in fluid mode) |
+| **Space** | Cycle draw mode: `SOLID` → `SAND` → `FLUID` |
+| **Hold E** | Erase: while held, cells under the cursor are continuously rubbed out (solids, sand, and any water that flows in) — no clicking needed |
 | **`[`** | Shrink the brush radius |
 | **`]`** | Grow the brush radius |
 | **G** | Toggle the debug grid-line overlay |

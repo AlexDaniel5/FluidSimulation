@@ -4,6 +4,7 @@
 void input_init(InputState& state) {
     state.isDrawing   = false;
     state.showGrid    = false;
+    state.eraseHeld   = false;
     state.mode        = MODE_SOLID;
     state.brushRadius = 1;
     state.prevMouseX  = 0;
@@ -24,13 +25,13 @@ static void paint_at(InputState& state, FluidState& fluid, int px, int py,
             int ox = cx - ccx, oy = cy - ccy;
             if (ox * ox + oy * oy > r * r) continue;  // disc, not square
 
-            if (state.mode == MODE_SOLID) {
+            if (state.eraseHeld) {
+                grid[cy][cx] = EMPTY;
+                fluid_remove(fluid, cx, cy);
+            } else if (state.mode == MODE_SOLID) {
                 grid[cy][cx] = SOLID;
             } else if (state.mode == MODE_SAND) {
                 grid[cy][cx] = SAND;
-            } else if (state.mode == MODE_ERASE) {
-                grid[cy][cx] = EMPTY;
-                fluid_remove(fluid, cx, cy);
             } else {
                 fluid_add_density(fluid, cx, cy, 0.5f);
                 // Particle velocities are in cells/second; turn the per-event
@@ -61,10 +62,17 @@ bool input_handle_event(InputState& state, const SDL_Event& event, FluidState& f
         state.prevMouseY = event.motion.y;
     }
 
+    if (event.type == SDL_KEYUP && event.key.keysym.sym == SDLK_e) {
+        state.eraseHeld = false;
+    }
+
     if (event.type == SDL_KEYDOWN) {
         switch (event.key.keysym.sym) {
             case SDLK_SPACE:
                 state.mode = static_cast<DrawMode>((state.mode + 1) % MODE_COUNT);
+                break;
+            case SDLK_e:
+                state.eraseHeld = true;  // momentary: erase while held
                 break;
             case SDLK_g:
                 state.showGrid = !state.showGrid;
@@ -86,4 +94,13 @@ bool input_handle_event(InputState& state, const SDL_Event& event, FluidState& f
     }
 
     return true;
+}
+
+void input_update(InputState& state, FluidState& fluid) {
+    if (!state.eraseHeld) return;
+    // Erase a disc at wherever the cursor currently is, every frame. The
+    // eraseHeld branch in paint_at does the actual removal.
+    int mx, my;
+    SDL_GetMouseState(&mx, &my);
+    paint_at(state, fluid, mx, my, 0.0f, 0.0f);
 }

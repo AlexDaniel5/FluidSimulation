@@ -17,7 +17,6 @@ static const char* mode_name(DrawMode m) {
         case MODE_SOLID: return "SOLID";
         case MODE_SAND:  return "SAND";
         case MODE_FLUID: return "FLUID";
-        case MODE_ERASE: return "ERASE";
         default:         return "?";
     }
 }
@@ -63,6 +62,7 @@ int main(int argc, char* argv[]) {
     SDL_Event event;
     DrawMode prevMode = input.mode;
     int prevBrush = -1;
+    bool prevErase = false;
 
     while (running) {
         while (SDL_PollEvent(&event)) {
@@ -70,14 +70,21 @@ int main(int argc, char* argv[]) {
                 running = false;
         }
 
-        // Update window title when draw mode or brush size changes
-        if (input.mode != prevMode || input.brushRadius != prevBrush) {
+        // Continuous, position-based erase (E held): runs every frame so
+        // material flowing under the cursor is removed without clicking.
+        input_update(input, fluid);
+
+        // Update window title when draw mode, brush size, or erase state changes
+        if (input.mode != prevMode || input.brushRadius != prevBrush ||
+            input.eraseHeld != prevErase) {
             char title[64];
             std::snprintf(title, sizeof(title), "FluidSimulation [%s]  brush:%d",
-                          mode_name(input.mode), input.brushRadius);
+                          input.eraseHeld ? "ERASE" : mode_name(input.mode),
+                          input.brushRadius);
             SDL_SetWindowTitle(window, title);
             prevMode = input.mode;
             prevBrush = input.brushRadius;
+            prevErase = input.eraseHeld;
         }
 
         frameCount++;
