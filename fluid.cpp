@@ -15,6 +15,10 @@ const float PARTICLE_MASS = 0.3f;   // render-density contribution
 const float MAX_SPEED     = 80.0f;  // cells/s
 const float REST_DENSITY  = (float)SEED_PER_CELL;  // mass per interior cell
 const float DRIFT_STIFF   = 3.0f;   // density-error feedback into pressure rhs
+const float DRIFT_MAX     = 2.0f;   // cap on density excess fed to drift, so a
+                                    // cell crammed by displaced water (e.g. sand
+                                    // placed into a pool) decompresses smoothly
+                                    // instead of erupting upward
 const int   PUSH_ITER     = 2;
 const float PUSH_DIST     = 0.45f;  // min particle spacing (4/cell => 0.5)
 
@@ -240,7 +244,7 @@ void solve_pressure(FluidState& s) {
             // decompresses particle pile-ups the plain solve can't see.
             float density = s.dens[IX(i + 1, j + 1)] / PARTICLE_MASS;
             if (density > REST_DENSITY)
-                s.rhs[c] += DRIFT_STIFF * (density - REST_DENSITY);
+                s.rhs[c] += DRIFT_STIFF * std::min(density - REST_DENSITY, DRIFT_MAX);
         }
     }
 
